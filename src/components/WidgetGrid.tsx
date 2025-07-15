@@ -10,6 +10,7 @@ interface Widget {
   content: React.ReactNode;
 }
 
+// Mock data for the widgets
 const mockWidgets: Widget[] = [
   {
     id: '1',
