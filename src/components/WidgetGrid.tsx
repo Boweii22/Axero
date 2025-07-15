@@ -10,127 +10,126 @@ interface Widget {
   content: React.ReactNode;
 }
 
-// Mock data for the widgets
-const mockWidgets: Widget[] = [
-  {
-    id: '1',
-    title: 'Live Collaboration',
-    type: 'document',
-    content: (
-      <div className="space-y-2">
-        <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-green-400 rounded-full flex items-center justify-center">
-            <span className="text-xs text-black font-bold">AK</span>
+export const WidgetGrid: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) => {
+  // Mock data for the widgets
+  const mockWidgets: Widget[] = [
+    {
+      id: '1',
+      title: 'Live Collaboration',
+      type: 'document',
+      content: (
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-green-400 rounded-full flex items-center justify-center">
+              <span className="text-xs text-black font-bold">AK</span>
+            </div>
+            <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>Alex is editing "Q4 Report"</span>
           </div>
-          <span className="text-sm text-gray-300">Alex is editing "Q4 Report"</span>
+          <div className={`${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-900'} rounded p-2 text-xs`}>
+            <p className={isDarkMode ? 'text-gray-400' : 'text-gray-900'}>Last updated: 2 minutes ago</p>
+            <p className={isDarkMode ? 'text-cyan-400' : 'text-black'}>3 collaborators active</p>
+          </div>
         </div>
-        <div className="bg-gray-800 rounded p-2 text-xs">
-          <p className="text-gray-400">Last updated: 2 minutes ago</p>
-          <p className="text-cyan-400">3 collaborators active</p>
+      )
+    },
+    {
+      id: '2',
+      title: 'Team Wellness',
+      type: 'wellness',
+      content: (
+        <div className="space-y-3">
+          <div className="flex justify-between items-center">
+            <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>Daily Steps</span>
+            <span className={`font-bold ${isDarkMode ? 'text-cyan-400' : 'text-black'}`}>8,247</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>Water Intake</span>
+            <span className={`font-bold ${isDarkMode ? 'text-blue-400' : 'text-black'}`}>6/8 glasses</span>
+          </div>
+          <div className="bg-gradient-to-r from-green-500 to-blue-500 h-2 rounded-full">
+            <div className="bg-white h-2 rounded-full w-3/4"></div>
+          </div>
         </div>
-      </div>
-    )
-  },
-  {
-    id: '2',
-    title: 'Team Wellness',
-    type: 'wellness',
-    content: (
-      <div className="space-y-3">
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-300">Daily Steps</span>
-          <span className="text-cyan-400 font-bold">8,247</span>
+      )
+    },
+    {
+      id: '3',
+      title: 'Easter Egg Hunt',
+      type: 'game',
+      content: (
+        <div className="text-center space-y-2">
+          <Gamepad2 className="w-8 h-8 text-purple-400 mx-auto" />
+          <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>Type "axero" to unlock</p>
+          <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-900'}`}>Hidden mini-game</p>
         </div>
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-300">Water Intake</span>
-          <span className="text-blue-400 font-bold">6/8 glasses</span>
+      )
+    },
+    {
+      id: '4',
+      title: 'Meeting Rooms',
+      type: 'calendar',
+      content: (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>Conference A</span>
+            <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>Conference B</span>
+            <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>Huddle Room</span>
+            <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+          </div>
         </div>
-        <div className="bg-gradient-to-r from-green-500 to-blue-500 h-2 rounded-full">
-          <div className="bg-white h-2 rounded-full w-3/4"></div>
+      )
+    },
+    {
+      id: '5',
+      title: 'Team Chat',
+      type: 'chat',
+      content: (
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2">
+            <div className="w-6 h-6 bg-blue-400 rounded-full"></div>
+            <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>Sarah: Great presentation!</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="w-6 h-6 bg-green-400 rounded-full"></div>
+            <span className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>Mike: Thanks team 🎉</span>
+          </div>
+          <div className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-900'}`}>3 new messages</div>
         </div>
-      </div>
-    )
-  },
-  {
-    id: '3',
-    title: 'Easter Egg Hunt',
-    type: 'game',
-    content: (
-      <div className="text-center space-y-2">
-        <Gamepad2 className="w-8 h-8 text-purple-400 mx-auto" />
-        <p className="text-sm text-gray-300">Type "axero" to unlock</p>
-        <p className="text-xs text-gray-500">Hidden mini-game</p>
-      </div>
-    )
-  },
-  {
-    id: '4',
-    title: 'Meeting Rooms',
-    type: 'calendar',
-    content: (
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-300">Conference A</span>
-          <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+      )
+    },
+    {
+      id: '6',
+      title: 'Performance',
+      type: 'metrics',
+      content: (
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>Productivity</span>
+            <span className={isDarkMode ? 'text-green-400' : 'text-black'}>+15%</span>
+          </div>
+          <div className="flex justify-between">
+            <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-black'}`}>Efficiency</span>
+            <span className={isDarkMode ? 'text-cyan-400' : 'text-black'}>94%</span>
+          </div>
+          <div className="h-12 bg-gradient-to-r from-purple-500/20 to-cyan-500/20 rounded flex items-end space-x-1 p-1">
+            {[40, 60, 80, 45, 90, 70, 85].map((height, i) => (
+              <div
+                key={i}
+                className="bg-gradient-to-t from-purple-500 to-cyan-500 rounded-sm flex-1"
+                style={{ height: `${height}%` }}
+              />
+            ))}
+          </div>
         </div>
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-300">Conference B</span>
-          <div className="w-3 h-3 bg-red-400 rounded-full"></div>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-300">Huddle Room</span>
-          <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-        </div>
-      </div>
-    )
-  },
-  {
-    id: '5',
-    title: 'Team Chat',
-    type: 'chat',
-    content: (
-      <div className="space-y-2">
-        <div className="flex items-center space-x-2">
-          <div className="w-6 h-6 bg-blue-400 rounded-full"></div>
-          <span className="text-xs text-gray-300">Sarah: Great presentation!</span>
-        </div>
-        <div className="flex items-center space-x-2">
-          <div className="w-6 h-6 bg-green-400 rounded-full"></div>
-          <span className="text-xs text-gray-300">Mike: Thanks team 🎉</span>
-        </div>
-        <div className="text-xs text-gray-500">3 new messages</div>
-      </div>
-    )
-  },
-  {
-    id: '6',
-    title: 'Performance',
-    type: 'metrics',
-    content: (
-      <div className="space-y-2">
-        <div className="flex justify-between">
-          <span className="text-sm text-gray-300">Productivity</span>
-          <span className="text-green-400">+15%</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-sm text-gray-300">Efficiency</span>
-          <span className="text-cyan-400">94%</span>
-        </div>
-        <div className="h-12 bg-gradient-to-r from-purple-500/20 to-cyan-500/20 rounded flex items-end space-x-1 p-1">
-          {[40, 60, 80, 45, 90, 70, 85].map((height, i) => (
-            <div
-              key={i}
-              className="bg-gradient-to-t from-purple-500 to-cyan-500 rounded-sm flex-1"
-              style={{ height: `${height}%` }}
-            />
-          ))}
-        </div>
-      </div>
-    )
-  }
-];
-
-export const WidgetGrid: React.FC = () => {
+      )
+    }
+  ];
   const [widgets, setWidgets] = useState(mockWidgets);
   const [easterEggUnlocked, setEasterEggUnlocked] = useState(false);
 
@@ -200,18 +199,16 @@ export const WidgetGrid: React.FC = () => {
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      className={`select-none bg-gradient-to-br ${getWidgetColor(widget.type)} backdrop-blur-sm rounded-lg border p-4 cursor-move transition-all duration-300 hover:scale-105 ${
-                        snapshot.isDragging ? 'scale-105 shadow-lg' : ''
-                      }`}
+                      className={`select-none ${isDarkMode ? `bg-gradient-to-br ${getWidgetColor(widget.type)} backdrop-blur-sm border ${snapshot.isDragging ? 'scale-105 shadow-lg border-blue-500/30' : 'border-blue-500/30'}` : 'bg-white border border-gray-200 shadow-lg'} rounded-lg p-4 cursor-move transition-all duration-300 hover:scale-105`}
                     >
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center space-x-2">
                           {getWidgetIcon(widget.type)}
-                          <h3 className="text-white font-medium text-sm">{widget.title}</h3>
+                          <h3 className={`font-medium text-sm ${isDarkMode ? 'text-white' : 'text-black'}`}>{widget.title}</h3>
                         </div>
                         <div className="w-2 h-2 bg-white/50 rounded-full"></div>
                       </div>
-                      <div className="text-gray-300">
+                      <div className={isDarkMode ? 'text-gray-300' : 'text-black'}>
                         {widget.content}
                       </div>
                     </div>

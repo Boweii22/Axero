@@ -57,17 +57,17 @@ function App() {
     <div className={`min-h-screen transition-all duration-500 ${
       isDarkMode 
         ? 'bg-gradient-to-br from-gray-900 via-black to-gray-900' 
-        : 'bg-gradient-to-br from-gray-100 via-white to-gray-100'
+        : 'bg-gradient-to-br from-white via-blue-50 to-purple-50'
     } ${isDyslexicFriendly ? 'font-mono' : ''}`}>
       
       {/* Glass-morphism overlay */}
-      <div className="fixed inset-0 bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 pointer-events-none" />
+      <div className={`fixed inset-0 pointer-events-none ${isDarkMode ? 'bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10' : 'bg-gradient-to-br from-cyan-200/20 via-purple-200/20 to-pink-200/20'}`} />
       
       {/* Header */}
       <motion.header
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="relative z-20 bg-black/20 backdrop-blur-sm border-b border-cyan-500/20"
+        className={`relative z-20 backdrop-blur-sm border-b ${isDarkMode ? 'bg-black/20 border-cyan-500/20' : 'bg-white/70 border-cyan-300/30 shadow-md'}`}
       >
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
@@ -162,7 +162,7 @@ function App() {
             <div className={`rounded-xl backdrop-blur-sm border p-6 ${
               isDarkMode
                 ? 'bg-black/20 border-gray-700/50'
-                : 'bg-white/20 border-gray-300/50'
+                : 'bg-gradient-to-br from-white via-blue-50 to-purple-50 border-gray-200/70 shadow-lg'
             }`}>
               <AIAssistant
                 isListening={isListening}
@@ -182,7 +182,7 @@ function App() {
             <div className={`rounded-xl backdrop-blur-sm border p-6 ${
               isDarkMode
                 ? 'bg-black/20 border-gray-700/50'
-                : 'bg-white/20 border-gray-300/50'
+                : 'bg-gradient-to-br from-white via-blue-50 to-purple-50 border-gray-200/70 shadow-lg'
             }`}>
               <OfficePulse />
             </div>
@@ -203,7 +203,7 @@ function App() {
                 Drag and drop widgets to customize your workspace
               </p>
             </div>
-            <WidgetGrid />
+            <WidgetGrid isDarkMode={isDarkMode} />
           </motion.div>
         </div>
       </main>
