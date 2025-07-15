@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Axero Workspace - Futuristic AI Intranet</title>
+    <meta name="description" content="Revolutionary AI-powered intranet dashboard with cutting-edge functionality">
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+      
+      /* Glass-morphism styles */
+      .glass {
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      
+      .glass-dark {
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      
+      ::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.1);
+      }
+      
+      ::-webkit-scrollbar-thumb {
+        background: rgba(6, 182, 212, 0.5);
+        border-radius: 4px;
+      }
+      
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(6, 182, 212, 0.7);
+      }
+      
+      /* Animation for floating elements */
+      @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+      }
+      
+      .float-animation {
+        animation: float 3s ease-in-out infinite;
+      }
+      
+      /* Neon glow effect */
+      .neon-glow {
+        box-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
+      }
+      
+      /* Pulse animation */
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+      
+      .pulse-animation {
+        animation: pulse 2s ease-in-out infinite;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
