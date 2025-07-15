@@ -199,7 +199,9 @@ export const WidgetGrid: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) =>
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      className={`select-none ${isDarkMode ? `bg-gradient-to-br ${getWidgetColor(widget.type)} backdrop-blur-sm border ${snapshot.isDragging ? 'scale-105 shadow-lg border-blue-500/30' : 'border-blue-500/30'}` : 'bg-white border border-gray-200 shadow-lg'} rounded-lg p-4 cursor-move transition-all duration-300 hover:scale-105`}
+                      className={`select-none ${isDarkMode
+                        ? `bg-gradient-to-br ${getWidgetColor(widget.type)} backdrop-blur-lg border border-white/10 shadow-xl rounded-2xl p-6 transition-all duration-300 hover:shadow-2xl hover:border-cyan-400/40`
+                        : 'bg-white/30 backdrop-blur-lg border border-white/30 shadow-xl rounded-2xl p-6 transition-all duration-300 hover:shadow-2xl hover:border-cyan-400/40'} cursor-move hover:scale-105`}
                     >
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center space-x-2">

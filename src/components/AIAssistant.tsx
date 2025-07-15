@@ -15,7 +15,89 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
 }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [currentResponse, setCurrentResponse] = useState('');
+  const [transcript, setTranscript] = useState('');
+  const recognitionRef = useRef<any>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Mock AI responses
+  const mockResponses: Record<string, string> = {
+    schedule: "Here's your schedule: 10am Standup, 1pm Design Review, 3pm 1:1 with Alex.",
+    online: "Alex, Sarah, and Mike are currently online.",
+    focus: "Activating Focus Mode... Stay productive!",
+    hello: "Good morning! How can I help you today?",
+    unread: "You have 5 unread emails. Would you like a summary?",
+    marketing: "The latest marketing presentation is in your shared drive.",
+    thanks: "You're welcome! Let me know if you need anything else.",
+    weather: "Today's weather is sunny, 72°F. Perfect for a walk!",
+    lunch: "Lunch is scheduled for 12:30pm. Today's menu: pasta and salad.",
+    coffee: "The coffee machine is working and freshly stocked!",
+    meeting: "Your next meeting is at 2pm with the product team.",
+    joke: "Why did the developer go broke? Because he used up all his cache!",
+    time: `It's ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}."`,
+    date: `Today is ${new Date().toLocaleDateString()}."`,
+    help: "You can ask about your schedule, who's online, the weather, or say 'tell me a joke'."
+  };
+  function getMockResponse(query: string) {
+    const lower = query.toLowerCase();
+    if (lower.includes('schedule')) return mockResponses.schedule;
+    if (lower.includes('online')) return mockResponses.online;
+    if (lower.includes('focus')) return mockResponses.focus;
+    if (lower.includes('hello') || lower.includes('hi')) return mockResponses.hello;
+    if (lower.includes('unread')) return mockResponses.unread;
+    if (lower.includes('marketing')) return mockResponses.marketing;
+    if (lower.includes('thank')) return mockResponses.thanks;
+    if (lower.includes('weather')) return mockResponses.weather;
+    if (lower.includes('lunch')) return mockResponses.lunch;
+    if (lower.includes('coffee')) return mockResponses.coffee;
+    if (lower.includes('meeting')) return mockResponses.meeting;
+    if (lower.includes('joke')) return mockResponses.joke;
+    if (lower.includes('time')) return mockResponses.time;
+    if (lower.includes('date')) return mockResponses.date;
+    if (lower.includes('help')) return mockResponses.help;
+    return "I'm here to help! Try asking about your schedule, the weather, or say 'tell me a joke'.";
+  }
+
+  useEffect(() => {
+    if (!isListening) return;
+    // Setup Web Speech API
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setCurrentResponse('Sorry, your browser does not support voice recognition.');
+      setTimeout(() => setCurrentResponse(''), 3000);
+      onToggleListening();
+      return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.onresult = (event: any) => {
+      const result = event.results[0][0].transcript;
+      setTranscript(result);
+      const response = getMockResponse(result);
+      setCurrentResponse(response);
+      onCommand(result);
+      // Speak the response aloud
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(new SpeechSynthesisUtterance(response));
+      setTimeout(() => {
+        setCurrentResponse('');
+        setTranscript('');
+        onToggleListening();
+      }, 3500);
+    };
+    recognition.onerror = (event: any) => {
+      setCurrentResponse('Sorry, I did not catch that. Please try again.');
+      setTimeout(() => setCurrentResponse(''), 2000);
+      setTranscript('');
+      onToggleListening();
+    };
+    recognitionRef.current = recognition;
+    recognition.start();
+    return () => {
+      recognition.stop();
+    };
+  }, [isListening]);
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -78,23 +160,11 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
   }, [isListening]);
 
   const handleVoiceCommand = () => {
-    if (isListening) {
-      // Simulate voice recognition
-      const commands = [
-        "Summarizing your 5 unread emails...",
-        "Finding the latest marketing presentation...",
-        "Activating Focus Mode...",
-        "Good morning! How can I help you today?"
-      ];
-      const randomCommand = commands[Math.floor(Math.random() * commands.length)];
-      setCurrentResponse(randomCommand);
-      onCommand(randomCommand);
-      
-      setTimeout(() => {
-        setCurrentResponse('');
-        onToggleListening();
-      }, 3000);
+    if (!isListening) {
+      onToggleListening();
     } else {
+      // If already listening, stop
+      if (recognitionRef.current) recognitionRef.current.stop();
       onToggleListening();
     }
   };
@@ -115,7 +185,8 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
         />
         <motion.button
           onClick={handleVoiceCommand}
-          className="relative z-10 w-24 h-24 rounded-full bg-gradient-to-br from-cyan-500/20 to-purple-600/20 backdrop-blur-sm border border-cyan-500/30 flex items-center justify-center transition-all duration-300 hover:scale-110"
+          aria-label={isListening ? 'Stop listening' : 'Start voice input'}
+          className="relative z-10 w-24 h-24 rounded-full bg-gradient-to-br from-cyan-500/20 to-purple-600/20 backdrop-blur-sm border border-cyan-500/30 flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-cyan-400"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -133,6 +204,16 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
       </div>
 
       <AnimatePresence>
+        {isListening && transcript && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="bg-black/40 backdrop-blur-sm rounded-lg px-4 py-2 border border-cyan-500/30 max-w-xs text-center mb-2"
+          >
+            <p className="text-cyan-400 text-sm">{transcript}</p>
+          </motion.div>
+        )}
         {currentResponse && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -146,7 +227,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
       </AnimatePresence>
 
       <div className="text-center mt-2">
-        <p className="text-sm text-gray-400">Say "Hey Axero" to start</p>
+        <p className="text-sm text-gray-400">Click the mic and speak to ask Axero anything</p>
         <p className="text-xs text-gray-500 mt-1">Workplace Guardian</p>
       </div>
     </motion.div>
