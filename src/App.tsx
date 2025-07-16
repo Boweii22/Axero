@@ -184,7 +184,7 @@ function App() {
                 ? 'bg-black/20 border-gray-700/50'
                 : 'bg-gradient-to-br from-white via-blue-50 to-purple-50 border-gray-200/70 shadow-lg'
             }`}>
-              <OfficePulse />
+              <OfficePulse isDarkMode={isDarkMode} />
             </div>
           </motion.div>
 

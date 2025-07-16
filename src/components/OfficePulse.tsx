@@ -27,7 +27,7 @@ function randomMood() {
   return moodList[Math.floor(Math.random() * moodList.length)];
 }
 
-export const OfficePulse: React.FC = () => {
+export const OfficePulse: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) => {
   const mountRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene>();
   const rendererRef = useRef<THREE.WebGLRenderer>();
@@ -90,21 +90,28 @@ export const OfficePulse: React.FC = () => {
     controls.update();
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0a0a1a);
-    scene.fog = new THREE.Fog(0x0a0a1a, 8, 16);
+    if (isDarkMode) {
+      scene.background = new THREE.Color(0x0a0a1a);
+      scene.fog = new THREE.Fog(0x0a0a1a, 8, 16);
+    } else {
+      scene.background = new THREE.Color(0xf6f8fa);
+      scene.fog = new THREE.Fog(0xf6f8fa, 8, 16);
+    }
     sceneRef.current = scene;
 
     // Subtle grid on the floor
-    const gridHelper = new THREE.GridHelper(8, 16, 0x444466, 0x222233);
+    const gridHelper = isDarkMode
+      ? new THREE.GridHelper(8, 16, 0x444466, 0x222233)
+      : new THREE.GridHelper(8, 16, 0xcccccc, 0xe0e0e0);
     gridHelper.position.y = 0.01;
     scene.add(gridHelper);
 
     // Create office floor
     const floorGeometry = new THREE.PlaneGeometry(8, 8);
     const floorMaterial = new THREE.MeshPhysicalMaterial({ 
-      color: 0x111122,
+      color: isDarkMode ? 0x111122 : 0xffffff,
       transparent: true,
-      opacity: 0.85,
+      opacity: isDarkMode ? 0.85 : 0.95,
       roughness: 0.7,
       metalness: 0.2,
       clearcoat: 0.2
@@ -115,13 +122,13 @@ export const OfficePulse: React.FC = () => {
     scene.add(floor);
 
     // Add ambient and point lights
-    const ambientLight = new THREE.AmbientLight(0x8888ff, 0.7);
+    const ambientLight = new THREE.AmbientLight(isDarkMode ? 0x8888ff : 0xffffff, 0.7);
     scene.add(ambientLight);
     const pointLight = new THREE.PointLight(0xffffff, 0.7, 20);
     pointLight.position.set(0, 6, 0);
     pointLight.castShadow = true;
     scene.add(pointLight);
-    const spotLight = new THREE.SpotLight(0x00ffff, 0.3, 20, Math.PI / 4, 0.5, 1);
+    const spotLight = new THREE.SpotLight(isDarkMode ? 0x00ffff : 0x00b4d8, 0.3, 20, Math.PI / 4, 0.5, 1);
     spotLight.position.set(0, 8, 0);
     scene.add(spotLight);
 
@@ -238,27 +245,12 @@ export const OfficePulse: React.FC = () => {
         setHoveredEmployee(null);
       }
     };
-    const onMouseClick = (event: MouseEvent) => {
-      const rect = renderer.domElement.getBoundingClientRect();
-      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-      raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(employeeObjects, true);
-      if (intersects.length > 0) {
-        const selectedObject = intersects[0].object.parent;
-        if (selectedObject && selectedObject.userData.employee) {
-          setSelectedEmployee(selectedObject.userData.employee);
-        }
-      }
-    };
     renderer.domElement.addEventListener('mousemove', onMouseMove);
-    renderer.domElement.addEventListener('click', onMouseClick);
     return () => {
       if (mountRef.current && renderer.domElement) {
         mountRef.current.removeChild(renderer.domElement);
       }
       renderer.domElement.removeEventListener('mousemove', onMouseMove);
-      renderer.domElement.removeEventListener('click', onMouseClick);
       renderer.dispose();
       controls.dispose();
     };
@@ -308,83 +300,42 @@ export const OfficePulse: React.FC = () => {
       <div className="relative">
         <div 
           ref={mountRef}
-          className="w-full max-w-[600px] h-[360px] rounded-xl overflow-hidden bg-gradient-to-br from-gray-900/60 to-black/80 backdrop-blur-lg border border-cyan-900/40 mx-auto"
+          className={`w-full max-w-[600px] h-[360px] rounded-xl overflow-hidden mx-auto ${isDarkMode ? 'bg-gradient-to-br from-gray-900/60 to-black/80 border-cyan-900/40' : 'bg-gradient-to-br from-white/80 to-blue-100/80 border-gray-200/70'}`}
         />
-        {/* Floating profile card above hovered/selected avatar */}
-        {avatarScreenPositions.map(pos => {
-          const isSelected = selectedEmployee && pos.id === selectedEmployee.id;
-          const isHovered = hoveredEmployee === pos.id;
-          if (isSelected || isHovered) {
-            const emp = employees.find(e => e.id === pos.id);
+        {/* No floating card on hover/selected avatar. Only show the side card for selectedEmployee. */}
+        
+        {hoveredEmployee && (() => {
+            const emp = employees.find(e => e.id === hoveredEmployee);
             if (!emp) return null;
             return (
-              <div
-                key={pos.id}
-                style={{
-                  position: 'absolute',
-                  left: pos.x - 60,
-                  top: pos.y - 80,
-                  width: 120,
-                  pointerEvents: 'none',
-                  textAlign: 'center',
-                  fontWeight: 500,
-                  color: 'white',
-                  textShadow: '0 2px 8px #000, 0 0 2px #000',
-                  fontSize: 14,
-                  zIndex: 20,
-                  background: 'rgba(30,30,60,0.72)',
-                  borderRadius: 16,
-                  padding: '10px 8px 8px 8px',
-                  backdropFilter: 'blur(8px)',
-                  border: '1.5px solid rgba(255,255,255,0.13)',
-                  boxShadow: '0 2px 12px rgba(0,0,0,0.18)',
-                  transition: 'all 0.3s',
-                }}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className={`absolute top-4 right-4 backdrop-blur-sm rounded-lg p-3 min-w-[200px] border ${isDarkMode ? 'bg-black/80 border-gray-700/50' : 'bg-white/90 border-gray-200/80'}`}
               >
-                <div style={{ fontSize: 22, marginBottom: 2 }}>{emp.mood}</div>
-                <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 1 }}>{emp.name}</div>
-                <div style={{ fontSize: 11, color: '#ffd700', fontWeight: 500, marginBottom: 4 }}>
-                  {emp.department.charAt(0).toUpperCase() + emp.department.slice(1)}
+                <div className="flex items-center space-x-2 mb-2">
+                  <span className="text-2xl">{emp.mood}</span>
+                  <div>
+                    <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{emp.name}</p>
+                    <p className={`text-xs ${getDepartmentColor(emp.department)}`}>
+                      {emp.department.charAt(0).toUpperCase() + emp.department.slice(1)}
+                    </p>
+                  </div>
                 </div>
-                <div style={{ fontSize: 11, color: '#aaa', marginBottom: 1 }}>Activity</div>
-                <div style={{ width: '100%', height: 6, background: '#222', borderRadius: 3, marginBottom: 1 }}>
-                  <div style={{ width: `${Math.round(emp.activity * 100)}%`, height: 6, borderRadius: 3, background: 'linear-gradient(90deg, #06b6d4, #8b5cf6)' }} />
+                <div className="flex items-center space-x-2">
+                  <div className={`flex-1 rounded-full h-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}` }>
+                    <div 
+                      className="bg-gradient-to-r from-cyan-500 to-purple-500 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${emp.activity * 100}%` }}
+                    />
+                  </div>
+                  <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-700'}`}>{Math.round(emp.activity * 100)}%</span>
                 </div>
-                <div style={{ fontSize: 10, color: '#ccc' }}>{Math.round(emp.activity * 100)}%</div>
-              </div>
+                <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Activity Level</p>
+              </motion.div>
             );
-          }
-          return null;
-        })}
-        
-        {selectedEmployee && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="absolute top-4 right-4 bg-black/80 backdrop-blur-sm rounded-lg p-3 border border-gray-700/50 min-w-[200px]"
-          >
-            <div className="flex items-center space-x-2 mb-2">
-              <span className="text-2xl">{selectedEmployee.mood}</span>
-              <div>
-                <p className="text-white font-medium">{selectedEmployee.name}</p>
-                <p className={`text-xs ${getDepartmentColor(selectedEmployee.department)}`}>
-                  {selectedEmployee.department.charAt(0).toUpperCase() + selectedEmployee.department.slice(1)}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="flex-1 bg-gray-700 rounded-full h-2">
-                <div 
-                  className="bg-gradient-to-r from-cyan-500 to-purple-500 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${selectedEmployee.activity * 100}%` }}
-                />
-              </div>
-              <span className="text-xs text-gray-400">{Math.round(selectedEmployee.activity * 100)}%</span>
-            </div>
-            <p className="text-xs text-gray-400 mt-1">Activity Level</p>
-          </motion.div>
-        )}
+          })()}
       </div>
     </div>
   );
