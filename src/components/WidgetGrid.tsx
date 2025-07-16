@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { motion } from 'framer-motion';
 import { FileText, Activity, Gamepad2, Calendar, MessageCircle, TrendingUp } from 'lucide-react';
+import Confetti from 'react-confetti';
 
 interface Widget {
   id: string;
@@ -9,6 +10,109 @@ interface Widget {
   type: 'document' | 'wellness' | 'game' | 'calendar' | 'chat' | 'metrics';
   content: React.ReactNode;
 }
+
+// Memory Match Mini-Game Component
+const memoryIcons = ['💻','☕','📅','🖨️','📎','📝','📞','📊','🖥️','🪑','📁','🔒'];
+function shuffle(array: any[]) {
+  let arr = array.slice();
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+const MemoryMatchGame: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+  const [cards, setCards] = useState(() => {
+    const selected = shuffle(memoryIcons).slice(0, 6);
+    const icons = shuffle([...selected, ...selected]);
+    return icons.map((icon, i) => ({ id: i, icon, flipped: false, matched: false }));
+  });
+  const [flipped, setFlipped] = useState<number[]>([]);
+  const [matchedCount, setMatchedCount] = useState(0);
+  const [moves, setMoves] = useState(0);
+  const [won, setWon] = useState(false);
+
+  React.useEffect(() => {
+    if (flipped.length === 2) {
+      setMoves(m => m + 1);
+      const [i1, i2] = flipped;
+      if (cards[i1].icon === cards[i2].icon) {
+        setTimeout(() => {
+          setCards(prev => prev.map((c, idx) =>
+            idx === i1 || idx === i2
+              ? { ...c, matched: true, flipped: false }
+              : c
+          ));
+          setFlipped([]);
+          setMatchedCount(count => {
+            if (count + 2 === cards.length) setWon(true);
+            return count + 2;
+          });
+        }, 600);
+      } else {
+        setTimeout(() => {
+          setCards(prev => prev.map((c, idx) =>
+            idx === i1 || idx === i2
+              ? { ...c, flipped: false }
+              : c
+          ));
+          setFlipped([]);
+        }, 900);
+      }
+    }
+  }, [flipped, cards]);
+
+  const handleFlip = (idx: number) => {
+    if (flipped.length < 2 && !cards[idx].flipped && !cards[idx].matched) {
+      setCards(prev => prev.map((c, i) => i === idx ? { ...c, flipped: true } : c));
+      setFlipped(prev => [...prev, idx]);
+    }
+  };
+  const handlePlayAgain = () => {
+    const selected = shuffle(memoryIcons).slice(0, 6);
+    const icons = shuffle([...selected, ...selected]);
+    setCards(icons.map((icon, i) => ({ id: i, icon, flipped: false, matched: false })));
+    setFlipped([]);
+    setMatchedCount(0);
+    setMoves(0);
+    setWon(false);
+  };
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-lg">
+      {won && <Confetti width={window.innerWidth} height={window.innerHeight} numberOfPieces={250} recycle={false} />}
+      <div className="bg-gradient-to-br from-white/90 to-blue-100/90 dark:from-gray-900/90 dark:to-black/90 rounded-2xl p-6 shadow-2xl border border-cyan-400/30 min-w-[340px] max-w-[95vw]">
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-xl font-bold text-cyan-600 dark:text-cyan-300">Memory Match</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-cyan-500 text-2xl font-bold">×</button>
+        </div>
+        <div className="grid grid-cols-4 gap-3 mb-4">
+          {cards.map((card, idx) => (
+            <button
+              key={card.id}
+              className={`w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-2xl md:text-3xl font-bold shadow-md border transition-all duration-200 ${card.flipped || card.matched ? 'bg-cyan-100 dark:bg-cyan-900/60 border-cyan-400/40' : 'bg-cyan-50 dark:bg-gray-800/60 border-cyan-200/20'} ${card.matched ? 'opacity-60' : 'hover:scale-105'}`}
+              onClick={() => handleFlip(idx)}
+              disabled={card.flipped || card.matched || flipped.length === 2}
+              style={{ cursor: card.flipped || card.matched ? 'default' : 'pointer' }}
+            >
+              {card.flipped || card.matched ? card.icon : '❓'}
+            </button>
+          ))}
+        </div>
+        <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-300 mb-2">
+          <span>Moves: {moves}</span>
+          <span>Matched: {matchedCount / 2} / 6</span>
+        </div>
+        {won && (
+          <div className="text-center mt-2">
+            <div className="text-3xl mb-2">🎉</div>
+            <div className="font-bold text-cyan-600 dark:text-cyan-300 mb-2">You Win!</div>
+            <button onClick={handlePlayAgain} className="px-4 py-2 rounded-lg bg-cyan-500 text-white font-semibold hover:bg-cyan-600 transition">Play Again</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export const WidgetGrid: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) => {
   // Mock data for the widgets
@@ -132,6 +236,8 @@ export const WidgetGrid: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) =>
   ];
   const [widgets, setWidgets] = useState(mockWidgets);
   const [easterEggUnlocked, setEasterEggUnlocked] = useState(false);
+  const [showEasterEggOverlay, setShowEasterEggOverlay] = useState(false);
+  const [showMemoryGame, setShowMemoryGame] = useState(false);
 
   const handleDragEnd = (result: any) => {
     if (!result.destination) return;
@@ -173,7 +279,8 @@ export const WidgetGrid: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) =>
       if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
         if (e.target.value.toLowerCase() === 'axero') {
           setEasterEggUnlocked(true);
-          setTimeout(() => setEasterEggUnlocked(false), 3000);
+          setShowEasterEggOverlay(true);
+          setShowMemoryGame(false);
         }
       }
     };
@@ -224,12 +331,12 @@ export const WidgetGrid: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) =>
       </DragDropContext>
 
       {/* Easter Egg Effect */}
-      {easterEggUnlocked && (
+      {easterEggUnlocked && showEasterEggOverlay && (
         <motion.div
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0 }}
-          className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-lg"
         >
           <div className="text-center">
             <motion.div
@@ -240,9 +347,24 @@ export const WidgetGrid: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) =>
               🎮
             </motion.div>
             <h2 className="text-4xl font-bold text-yellow-400 mb-2">Easter Egg Found!</h2>
-            <p className="text-white">You discovered the hidden mini-game!</p>
+            <p className="text-white mb-4">You discovered the hidden mini-game!</p>
+            <button
+              className="mt-2 px-6 py-3 rounded-lg bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-semibold text-lg shadow-lg hover:scale-105 transition-transform focus:outline-none focus:ring-2 focus:ring-cyan-400"
+              onClick={() => {
+                setShowEasterEggOverlay(false);
+                setShowMemoryGame(true);
+              }}
+            >
+              Start
+            </button>
           </div>
         </motion.div>
+      )}
+      {easterEggUnlocked && showMemoryGame && (
+        <MemoryMatchGame onClose={() => {
+          setEasterEggUnlocked(false);
+          setShowMemoryGame(false);
+        }} />
       )}
     </div>
   );
