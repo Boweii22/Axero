@@ -144,7 +144,7 @@ function App() {
   };
 
   // Profile state
-  const [profile, setProfile] = useState(loaded?.profile || { name: 'Bowei Wang', email: 'bowei@example.com' });
+  const [profile, setProfile] = useState(loaded?.profile || { name: 'John Doe', email: 'johndoe@gmail.com' });
   const [editingProfile, setEditingProfile] = useState(false);
   const [editProfileDraft, setEditProfileDraft] = useState(profile);
   const [defaultPage, setDefaultPage] = useState(loaded?.defaultPage || 'Dashboard');
