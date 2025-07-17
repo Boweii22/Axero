@@ -27,7 +27,7 @@ function randomMood() {
   return moodList[Math.floor(Math.random() * moodList.length)];
 }
 
-export const OfficePulse: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) => {
+export const OfficePulse: React.FC<{ isDarkMode: boolean; accentColor?: string }> = ({ isDarkMode, accentColor }) => {
   const mountRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene>();
   const rendererRef = useRef<THREE.WebGLRenderer>();
@@ -206,9 +206,9 @@ export const OfficePulse: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) =
         obj.position.y = employees[index].position.y + Math.sin(time * 1.2 + index) * 0.08;
       });
       if (autoRotate) {
-        camera.position.x = Math.sin(time * 0.2) * 6;
-        camera.position.z = Math.cos(time * 0.2) * 6;
-        camera.lookAt(0, 0, 0);
+      camera.position.x = Math.sin(time * 0.2) * 6;
+      camera.position.z = Math.cos(time * 0.2) * 6;
+      camera.lookAt(0, 0, 0);
       } else {
         controls.update();
       }
@@ -270,8 +270,19 @@ export const OfficePulse: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) =
     <div className="relative">
       <button
         onClick={() => setAutoRotate((v) => !v)}
-        className="absolute right-4 top-4 z-30 px-3 py-1 rounded-lg bg-black/60 text-xs text-cyan-300 border border-cyan-700 hover:bg-cyan-900/40 transition"
-        style={{ backdropFilter: 'blur(4px)' }}
+        className="absolute right-4 top-4 z-30 px-3 py-1 rounded-lg bg-black/60 text-xs border transition"
+        style={{ 
+          backdropFilter: 'blur(4px)',
+          color: accentColor || '#06b6d4',
+          borderColor: accentColor || '#06b6d4',
+          backgroundColor: 'rgba(0, 0, 0, 0.6)'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
+        }}
       >
         {autoRotate ? 'Disable Auto-Rotate' : 'Enable Auto-Rotate'}
       </button>
@@ -308,32 +319,32 @@ export const OfficePulse: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) =
             const emp = employees.find(e => e.id === hoveredEmployee);
             if (!emp) return null;
             return (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
                 className={`absolute top-4 right-4 backdrop-blur-sm rounded-lg p-3 min-w-[200px] border ${isDarkMode ? 'bg-black/80 border-gray-700/50' : 'bg-white/90 border-gray-200/80'}`}
-              >
-                <div className="flex items-center space-x-2 mb-2">
+          >
+            <div className="flex items-center space-x-2 mb-2">
                   <span className="text-2xl">{emp.mood}</span>
-                  <div>
+              <div>
                     <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{emp.name}</p>
                     <p className={`text-xs ${getDepartmentColor(emp.department)}`}>
                       {emp.department.charAt(0).toUpperCase() + emp.department.slice(1)}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
                   <div className={`flex-1 rounded-full h-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}` }>
-                    <div 
-                      className="bg-gradient-to-r from-cyan-500 to-purple-500 h-2 rounded-full transition-all duration-300"
+                <div 
+                  className="bg-gradient-to-r from-cyan-500 to-purple-500 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${emp.activity * 100}%` }}
-                    />
-                  </div>
+                />
+              </div>
                   <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-700'}`}>{Math.round(emp.activity * 100)}%</span>
-                </div>
+            </div>
                 <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Activity Level</p>
-              </motion.div>
+          </motion.div>
             );
           })()}
       </div>

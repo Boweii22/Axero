@@ -6,12 +6,14 @@ interface AIAssistantProps {
   isListening: boolean;
   onToggleListening: () => void;
   onCommand: (command: string) => void;
+  accentColor?: string;
 }
 
 export const AIAssistant: React.FC<AIAssistantProps> = ({ 
   isListening, 
   onToggleListening, 
-  onCommand 
+  onCommand,
+  accentColor = '#06b6d4'
 }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [currentResponse, setCurrentResponse] = useState('');
@@ -120,10 +122,18 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
       // Create pulsing orb effect
       const pulseIntensity = isListening ? 1 + Math.sin(time * 8) * 0.3 : 0.8;
       
+      // Convert hex to rgba for the accent color
+      const hexToRgba = (hex: string, alpha: number) => {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+      };
+      
       // Outer glow
       const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius * pulseIntensity);
-      gradient.addColorStop(0, isListening ? 'rgba(0, 255, 255, 0.8)' : 'rgba(147, 51, 234, 0.6)');
-      gradient.addColorStop(0.5, isListening ? 'rgba(0, 255, 255, 0.4)' : 'rgba(147, 51, 234, 0.3)');
+      gradient.addColorStop(0, isListening ? hexToRgba(accentColor, 0.8) : hexToRgba(accentColor, 0.6));
+      gradient.addColorStop(0.5, isListening ? hexToRgba(accentColor, 0.4) : hexToRgba(accentColor, 0.3));
       gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
       
       ctx.fillStyle = gradient;
@@ -132,7 +142,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
       // Core orb
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius * 0.6 * pulseIntensity, 0, Math.PI * 2);
-      ctx.fillStyle = isListening ? 'rgba(0, 255, 255, 0.3)' : 'rgba(147, 51, 234, 0.3)';
+      ctx.fillStyle = isListening ? hexToRgba(accentColor, 0.3) : hexToRgba(accentColor, 0.3);
       ctx.fill();
       
       // Particle effects
@@ -143,7 +153,7 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
         
         ctx.beginPath();
         ctx.arc(x, y, 2, 0, Math.PI * 2);
-        ctx.fillStyle = isListening ? 'rgba(0, 255, 255, 0.8)' : 'rgba(147, 51, 234, 0.8)';
+        ctx.fillStyle = isListening ? hexToRgba(accentColor, 0.8) : hexToRgba(accentColor, 0.8);
         ctx.fill();
       }
       
@@ -157,11 +167,11 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
         cancelAnimationFrame(animationId);
       }
     };
-  }, [isListening]);
+  }, [isListening, accentColor]);
 
   const handleVoiceCommand = () => {
     if (!isListening) {
-      onToggleListening();
+        onToggleListening();
     } else {
       // If already listening, stop
       if (recognitionRef.current) recognitionRef.current.stop();
@@ -186,7 +196,12 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
         <motion.button
           onClick={handleVoiceCommand}
           aria-label={isListening ? 'Stop listening' : 'Start voice input'}
-          className="relative z-10 w-24 h-24 rounded-full bg-gradient-to-br from-cyan-500/20 to-purple-600/20 backdrop-blur-sm border border-cyan-500/30 flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+          className="relative z-10 w-24 h-24 rounded-full backdrop-blur-sm border flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2"
+          style={{
+            background: `linear-gradient(135deg, ${accentColor}20, ${accentColor}10)`,
+            borderColor: `${accentColor}30`,
+            boxShadow: `0 0 20px ${accentColor}20`
+          }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -195,9 +210,9 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
             transition={{ duration: 2, repeat: isListening ? Infinity : 0, ease: "linear" }}
           >
             {isListening ? (
-              <MicOff className="w-8 h-8 text-cyan-400" />
+              <MicOff className="w-8 h-8" style={{ color: accentColor }} />
             ) : (
-              <Mic className="w-8 h-8 text-purple-400" />
+              <Mic className="w-8 h-8" style={{ color: accentColor }} />
             )}
           </motion.div>
         </motion.button>
@@ -209,9 +224,10 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="bg-black/40 backdrop-blur-sm rounded-lg px-4 py-2 border border-cyan-500/30 max-w-xs text-center mb-2"
+            className="bg-black/40 backdrop-blur-sm rounded-lg px-4 py-2 border max-w-xs text-center mb-2"
+            style={{ borderColor: `${accentColor}30` }}
           >
-            <p className="text-cyan-400 text-sm">{transcript}</p>
+            <p className="text-sm" style={{ color: accentColor }}>{transcript}</p>
           </motion.div>
         )}
         {currentResponse && (
@@ -219,9 +235,10 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="bg-black/40 backdrop-blur-sm rounded-lg px-4 py-2 border border-cyan-500/30 max-w-xs text-center"
+            className="bg-black/40 backdrop-blur-sm rounded-lg px-4 py-2 border max-w-xs text-center"
+            style={{ borderColor: `${accentColor}30` }}
           >
-            <p className="text-cyan-400 text-sm">{currentResponse}</p>
+            <p className="text-sm" style={{ color: accentColor }}>{currentResponse}</p>
           </motion.div>
         )}
       </AnimatePresence>

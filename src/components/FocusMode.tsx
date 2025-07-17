@@ -5,9 +5,10 @@ import { Focus, Play, Pause, RotateCcw } from 'lucide-react';
 interface FocusModeProps {
   isActive: boolean;
   onToggle: () => void;
+  accentColor?: string;
 }
 
-export const FocusMode: React.FC<FocusModeProps> = ({ isActive, onToggle }) => {
+export const FocusMode: React.FC<FocusModeProps> = ({ isActive, onToggle, accentColor = '#06b6d4' }) => {
   const [timeLeft, setTimeLeft] = useState(25 * 60); // 25 minutes
   const [isRunning, setIsRunning] = useState(false);
   const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; delay: number }>>([]);
@@ -26,7 +27,7 @@ export const FocusMode: React.FC<FocusModeProps> = ({ isActive, onToggle }) => {
   }, [isActive]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (isRunning && timeLeft > 0) {
       interval = setInterval(() => {
         setTimeLeft(time => time - 1);
@@ -74,10 +75,11 @@ export const FocusMode: React.FC<FocusModeProps> = ({ isActive, onToggle }) => {
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: [0, 1, 0], scale: [0, 1, 0] }}
               transition={{ duration: 2, delay: particle.delay, repeat: Infinity }}
-              className="absolute w-2 h-2 bg-cyan-400 rounded-full"
+              className="absolute w-2 h-2 rounded-full"
               style={{
                 left: `${particle.x}%`,
                 top: `${particle.y}%`,
+                backgroundColor: accentColor
               }}
             />
           ))}
@@ -89,7 +91,7 @@ export const FocusMode: React.FC<FocusModeProps> = ({ isActive, onToggle }) => {
               transition={{ delay: 0.3 }}
               className="mb-8"
             >
-              <Focus className="w-16 h-16 text-cyan-400 mx-auto mb-4" />
+              <Focus className="w-16 h-16 mx-auto mb-4" style={{ color: accentColor }} />
               <h2 className="text-4xl font-bold text-white mb-2">Focus Mode</h2>
               <p className="text-gray-400">Deep work session activated</p>
             </motion.div>
@@ -100,24 +102,18 @@ export const FocusMode: React.FC<FocusModeProps> = ({ isActive, onToggle }) => {
               transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
               className="relative mb-8"
             >
-              <div className="w-64 h-64 rounded-full border-4 border-cyan-500/30 flex items-center justify-center relative">
+              <div className="w-64 h-64 rounded-full border-4 flex items-center justify-center relative" style={{ borderColor: accentColor + '4D' }}>
                 <svg className="absolute inset-0 w-full h-full -rotate-90">
                   <circle
                     cx="128"
                     cy="128"
                     r="120"
                     fill="none"
-                    stroke="url(#gradient)"
+                    stroke={accentColor}
                     strokeWidth="4"
                     strokeDasharray={`${((25 * 60 - timeLeft) / (25 * 60)) * 754} 754`}
                     className="transition-all duration-1000"
                   />
-                  <defs>
-                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#06b6d4" />
-                      <stop offset="100%" stopColor="#8b5cf6" />
-                    </linearGradient>
-                  </defs>
                 </svg>
                 <div className="text-center">
                   <div className="text-5xl font-mono text-white mb-2">
@@ -138,7 +134,8 @@ export const FocusMode: React.FC<FocusModeProps> = ({ isActive, onToggle }) => {
             >
               <button
                 onClick={toggleTimer}
-                className="flex items-center space-x-2 bg-gradient-to-r from-cyan-500 to-purple-500 text-white px-6 py-3 rounded-full hover:scale-105 transition-transform"
+                className="flex items-center space-x-2 text-white px-6 py-3 rounded-full hover:scale-105 transition-transform"
+                style={{ background: `linear-gradient(90deg, ${accentColor} 0%, #8b5cf6 100%)` }}
               >
                 {isRunning ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
                 <span>{isRunning ? 'Pause' : 'Start'}</span>
