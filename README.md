@@ -108,4 +108,4 @@ MIT License. See [LICENSE](./LICENSE) for details.
 
 ---
 
-> _Axero Workspace is a demo project by [Your Name]. For questions or support, open an issue or contact [your@email.com]._ 
+> _Axero Workspace is a demo project by [Bowei Tombri]. For questions or support, open an issue or contact [tombribowei01@gmail.com]._ 
