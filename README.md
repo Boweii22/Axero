@@ -24,44 +24,32 @@ A modern, themeable, and highly interactive React dashboard app for teams and in
 
 > _Add your own screenshots here!_
 
-- ![Dashboard Example](./screenshots/dashboard.png)
-- ![3D OfficePulse](./screenshots/officepulse.png)
-- ![AI Assistant](./screenshots/ai-assistant.png)
+
 
 ---
 
 ## 🛠️ Getting Started
-
-### Prerequisites
-- Node.js (v16+ recommended)
-- npm or yarn
-
 ### Installation
 ```bash
 # Clone the repo
-git clone https://github.com/yourusername/axero-workspace.git
+git clone https://github.com/Boweii22/Axero.git
 cd axero-workspace
 
 # Install dependencies
 npm install
-# or
-yarn install
 ```
 
 ### Running the App
 ```bash
 npm run dev
-# or
-yarn dev
 ```
-Visit [http://localhost:5173](http://localhost:5173) in your browser.
+Visit [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
 ## ⚙️ Customization
 - **Accent Color**: Change in the settings panel; updates all UI elements live.
 - **Theme**: Toggle dark/light mode and dyslexic font in settings.
-- **Widget Order**: Drag and drop widgets; order is saved in your browser.
 - **Profile & Preferences**: Edit your name, email, and workspace preferences in settings.
 
 ---
@@ -91,8 +79,7 @@ Contributions are welcome! To get started:
 4. Commit and push (`git commit -m 'Add new feature' && git push`)
 5. Open a Pull Request
 
-Please follow the code style and add comments for complex logic. See the [issues](https://github.com/yourusername/axero-workspace/issues) for ideas.
-
+Please follow the code style and add comments for complex logic. 
 ---
 
 ## 📄 License
@@ -101,11 +88,4 @@ MIT License. See [LICENSE](./LICENSE) for details.
 
 ---
 
-## 🙏 Acknowledgements
-- Built with [React](https://reactjs.org/), [Vite](https://vitejs.dev/), [Tailwind CSS](https://tailwindcss.com/), [Framer Motion](https://www.framer.com/motion/), [@hello-pangea/dnd](https://github.com/hello-pangea/dnd), and more.
-- 3D visualization powered by [three.js](https://threejs.org/).
-- Icons by [Lucide](https://lucide.dev/).
-
----
-
-> _Axero Workspace is a demo project by [Bowei Tombri]. For questions or support, open an issue or contact [tombribowei01@gmail.com]._ 
+> _Axero Workspace is a demo project by Bowei Tombri. For questions or support, open an issue or contact tombribowei01@gmail.com._ 
