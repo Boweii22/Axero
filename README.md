@@ -2,7 +2,7 @@
 
 # Axero Workspace
 
-A modern, themeable, and highly interactive React dashboard app for teams and individuals. Axero Workspace combines productivity, creativity, and accessibility in a beautiful, responsive UI—featuring drag-and-drop widgets, a 3D office visualization, an AI assistant, and more.
+A modern, themeable, and highly interactive React dashboard app for teams and individuals. Axero Workspace combines all round productivity, creativity, and accessibility in a beautiful, responsive UI—featuring drag-and-drop widgets, a 3D office visualization, an AI assistant, and many more.
 
 ---
 
